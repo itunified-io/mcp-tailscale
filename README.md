@@ -22,15 +22,16 @@ Slim Tailscale MCP Server for managing devices, DNS/Split DNS, ACL policies, aut
 
 ## Features
 
-42 tools across 8 domains:
+48 tools across 9 domains:
 
-- **Devices** — List, get, delete, authorize devices; manage routes, tags, and posture attributes
+- **Devices** — List, get, delete, authorize, expire, rename devices; manage routes, tags, and posture attributes
 - **DNS** — Global nameservers, search paths, split DNS configuration, MagicDNS preferences
 - **ACL** — Get, set, preview, validate, and test ACL policies
 - **Keys** — List, get, create, and revoke auth keys
 - **Tailnet** — Settings (read/write), contacts, Tailnet Lock status
 - **Users** — List and get tailnet users with role/type filtering
 - **Webhooks** — Create, list, get, and delete webhook endpoints
+- **Posture Integrations** — List, get, create, and delete third-party posture provider integrations
 - **Diagnostics** — Tailnet status summary, API connectivity check, log streaming, DERP map
 
 **Authentication:** API key or OAuth client credentials (auto-refresh)
@@ -85,7 +86,7 @@ Add to `.mcp.json` in your project root:
 
 ## Tools
 
-### Devices (9 tools)
+### Devices (11 tools)
 
 | Tool | Description |
 |------|-------------|
@@ -98,6 +99,8 @@ Add to `.mcp.json` in your project root:
 | `tailscale_device_tags_set` | Set ACL tags on a device |
 | `tailscale_device_posture_get` | Get custom posture attributes |
 | `tailscale_device_posture_set` | Set a custom posture attribute |
+| `tailscale_device_expire` | Expire a device key (requires `confirm: true`) |
+| `tailscale_device_rename` | Set a custom display name for a device |
 
 ### DNS (8 tools)
 
@@ -156,6 +159,15 @@ Add to `.mcp.json` in your project root:
 | `tailscale_webhook_create` | Create a webhook endpoint |
 | `tailscale_webhook_get` | Get webhook details by ID |
 | `tailscale_webhook_delete` | Delete a webhook (requires `confirm: true`) |
+
+### Posture Integrations (4 tools)
+
+| Tool | Description |
+|------|-------------|
+| `tailscale_posture_integration_list` | List all posture provider integrations |
+| `tailscale_posture_integration_get` | Get posture integration details by ID |
+| `tailscale_posture_integration_create` | Create a posture provider integration |
+| `tailscale_posture_integration_delete` | Delete a posture integration (requires `confirm: true`) |
 
 ### Diagnostics (5 tools)
 

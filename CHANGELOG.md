@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 This project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD.TS`).
 
 
+## v2026.03.14.5
+
+- **Tier 2 Enhancement: Device expire/rename + posture integration tools** (#13)
+  - Add `tailscale_device_expire` — force device key expiry (+1 tool)
+  - Add `tailscale_device_rename` — set device display name (+1 tool)
+  - Add posture integration tools: `tailscale_posture_integration_list`, `tailscale_posture_integration_get`, `tailscale_posture_integration_create`, `tailscale_posture_integration_delete` (+4 tools)
+  - Total: 42 → 48 tools across 9 domains
+  - 178 unit tests (was 158)
+  - Design doc: `docs/plans/002-tier2-enhancement.md`
+
 ## v2026.03.14.4
 
 - **Tier 1 Enhancement: OAuth, Users, Webhooks, Tailnet Settings Write** (#7)

@@ -24,8 +24,8 @@ function mockClient(overrides: Partial<ITailscaleClient> = {}): TailscaleClient 
 // ---------------------------------------------------------------------------
 
 describe("Device Tool Definitions", () => {
-  it("exports 9 tool definitions", () => {
-    expect(deviceToolDefinitions).toHaveLength(9);
+  it("exports 11 tool definitions", () => {
+    expect(deviceToolDefinitions).toHaveLength(11);
   });
 
   it("all tools have tailscale_device_ prefix", () => {
@@ -313,6 +313,131 @@ describe("handleDeviceTool", () => {
       }, client);
 
       expect(result.content[0].text).toContain("Error executing tailscale_device_posture_set");
+    });
+  });
+
+  describe("tailscale_device_expire", () => {
+    it("expires a device key when confirmed", async () => {
+      const client = mockClient({ postVoid: vi.fn().mockResolvedValue(undefined) });
+
+      const result = await handleDeviceTool(
+        "tailscale_device_expire",
+        { deviceId: DEVICE_ID, confirm: true },
+        client,
+      );
+
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.expired).toBe(true);
+      expect(parsed.deviceId).toBe(DEVICE_ID);
+      expect(client.postVoid).toHaveBeenCalledWith(
+        `/device/${DEVICE_ID}/key`,
+        { keyExpiryDisabled: false },
+      );
+    });
+
+    it("rejects expire without confirm: true", async () => {
+      const client = mockClient();
+
+      const result = await handleDeviceTool(
+        "tailscale_device_expire",
+        { deviceId: DEVICE_ID, confirm: false },
+        client,
+      );
+
+      expect(result.content[0].text).toContain("Error executing tailscale_device_expire");
+    });
+
+    it("requires confirm parameter", async () => {
+      const client = mockClient();
+
+      const result = await handleDeviceTool(
+        "tailscale_device_expire",
+        { deviceId: DEVICE_ID },
+        client,
+      );
+
+      expect(result.content[0].text).toContain("Error executing tailscale_device_expire");
+    });
+
+    it("handles API errors gracefully", async () => {
+      const client = mockClient({ postVoid: vi.fn().mockRejectedValue(new Error("Not found")) });
+
+      const result = await handleDeviceTool(
+        "tailscale_device_expire",
+        { deviceId: DEVICE_ID, confirm: true },
+        client,
+      );
+
+      expect(result.content[0].text).toContain("Error executing tailscale_device_expire");
+    });
+  });
+
+  describe("tailscale_device_rename", () => {
+    it("renames a device", async () => {
+      const client = mockClient({ postVoid: vi.fn().mockResolvedValue(undefined) });
+
+      const result = await handleDeviceTool(
+        "tailscale_device_rename",
+        { deviceId: DEVICE_ID, name: "my-new-name" },
+        client,
+      );
+
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.renamed).toBe(true);
+      expect(parsed.deviceId).toBe(DEVICE_ID);
+      expect(parsed.name).toBe("my-new-name");
+      expect(client.postVoid).toHaveBeenCalledWith(
+        `/device/${DEVICE_ID}/name`,
+        { name: "my-new-name" },
+      );
+    });
+
+    it("requires non-empty name", async () => {
+      const client = mockClient();
+
+      const result = await handleDeviceTool(
+        "tailscale_device_rename",
+        { deviceId: DEVICE_ID, name: "" },
+        client,
+      );
+
+      expect(result.content[0].text).toContain("Error executing tailscale_device_rename");
+    });
+
+    it("rejects name exceeding 255 characters", async () => {
+      const client = mockClient();
+
+      const result = await handleDeviceTool(
+        "tailscale_device_rename",
+        { deviceId: DEVICE_ID, name: "a".repeat(256) },
+        client,
+      );
+
+      expect(result.content[0].text).toContain("Error executing tailscale_device_rename");
+    });
+
+    it("requires name parameter", async () => {
+      const client = mockClient();
+
+      const result = await handleDeviceTool(
+        "tailscale_device_rename",
+        { deviceId: DEVICE_ID },
+        client,
+      );
+
+      expect(result.content[0].text).toContain("Error executing tailscale_device_rename");
+    });
+
+    it("handles API errors gracefully", async () => {
+      const client = mockClient({ postVoid: vi.fn().mockRejectedValue(new Error("Forbidden")) });
+
+      const result = await handleDeviceTool(
+        "tailscale_device_rename",
+        { deviceId: DEVICE_ID, name: "new-name" },
+        client,
+      );
+
+      expect(result.content[0].text).toContain("Error executing tailscale_device_rename");
     });
   });
 

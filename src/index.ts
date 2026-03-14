@@ -15,6 +15,7 @@ import { tailnetToolDefinitions, handleTailnetTool } from "./tools/tailnet.js";
 import { diagnosticsToolDefinitions, handleDiagnosticsTool } from "./tools/diagnostics.js";
 import { userToolDefinitions, handleUserTool } from "./tools/users.js";
 import { webhookToolDefinitions, handleWebhookTool } from "./tools/webhooks.js";
+import { postureToolDefinitions, handlePostureTool } from "./tools/posture.js";
 
 const allToolDefinitions: Tool[] = ([
   ...deviceToolDefinitions,
@@ -25,6 +26,7 @@ const allToolDefinitions: Tool[] = ([
   ...diagnosticsToolDefinitions,
   ...userToolDefinitions,
   ...webhookToolDefinitions,
+  ...postureToolDefinitions,
 ] as unknown) as Tool[];
 
 const toolHandlers = new Map<
@@ -40,6 +42,7 @@ for (const def of tailnetToolDefinitions) toolHandlers.set(def.name, handleTailn
 for (const def of diagnosticsToolDefinitions) toolHandlers.set(def.name, handleDiagnosticsTool);
 for (const def of userToolDefinitions) toolHandlers.set(def.name, handleUserTool);
 for (const def of webhookToolDefinitions) toolHandlers.set(def.name, handleWebhookTool);
+for (const def of postureToolDefinitions) toolHandlers.set(def.name, handlePostureTool);
 
 const server = new Server(
   { name: "mcp-tailscale", version: "2026.3.14" },

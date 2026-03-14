@@ -303,3 +303,26 @@ export interface TailnetSettingsUpdate {
   regionalRoutingOn?: boolean;
   postureIdentityCollectionOn?: boolean;
 }
+
+// Posture integration types
+export interface PostureIntegration {
+  id: string;
+  provider: string;
+  cloudId?: string;
+  clientId?: string;
+  tenantId?: string;
+  created: string;
+  lastModified: string;
+}
+
+export interface PostureIntegrationListResponse {
+  integrations: PostureIntegration[];
+}
+
+export interface PostureIntegrationCreateRequest {
+  provider: string;
+  cloudId?: string;
+  clientId?: string;
+  clientSecret?: string;
+  tenantId?: string;
+}
