@@ -15,6 +15,7 @@ Slim Tailscale MCP Server for managing devices, DNS/Split DNS, ACL policies, aut
 - [Features](#features)
 - [Quick Start](#quick-start)
 - [Claude Code Integration](#claude-code-integration)
+- [Skills](#skills)
 - [SSE Transport](#sse-transport)
 - [Configuration](#configuration)
 - [Tools](#tools)
@@ -65,6 +66,20 @@ Add to `.mcp.json` in your project root:
   }
 }
 ```
+
+## Skills
+
+Claude Code skills compose MCP tools into higher-level workflows. See [`.claude/skills/README.md`](.claude/skills/README.md) for detailed documentation.
+
+| Skill | Slash Command | Description |
+|-------|--------------|-------------|
+| tailscale-health | `/ts-health` | Tailnet health dashboard — devices, DNS, ACL, keys, connectivity |
+| tailscale-live-test | `/ts-test` | Live integration test — read + safe writes with cleanup |
+| tailscale-acl-management | — | ACL policy management — view, edit, validate, test, drift detection |
+| tailscale-device-management | — | Device management — list, authorize, routes, tags, posture |
+| tailscale-dns-management | — | DNS management — split DNS, nameservers, search paths, MagicDNS |
+| tailscale-key-management | — | Auth key management — create, list, rotate, revoke |
+| tailscale-onboarding | — | New device onboarding — auth key, authorize, tags, routes, verify |
 
 ## SSE Transport
 
