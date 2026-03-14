@@ -42,6 +42,18 @@ const DevicePostureGetSchema = z.object({
   deviceId: DeviceIdSchema,
 });
 
+const DeviceExpireSchema = z.object({
+  deviceId: DeviceIdSchema,
+  confirm: z.literal(true, {
+    errorMap: () => ({ message: "confirm must be true to expire a device key" }),
+  }),
+});
+
+const DeviceRenameSchema = z.object({
+  deviceId: DeviceIdSchema,
+  name: z.string().min(1, "Device name is required").max(255, "Device name too long"),
+});
+
 const DevicePostureSetSchema = z.object({
   deviceId: DeviceIdSchema,
   attributeKey: z.string().min(1, "Attribute key is required"),
@@ -202,6 +214,44 @@ export const deviceToolDefinitions = [
       required: ["deviceId", "attributeKey", "value"],
     },
   },
+  {
+    name: "tailscale_device_expire",
+    description:
+      "Expire a device's key, forcing it to re-authenticate. The device remains in the tailnet but loses connectivity until re-authenticated. This is one-directional — once expired, the device must re-auth. Requires confirm: true.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        deviceId: {
+          type: "string",
+          description: "Tailscale device ID",
+        },
+        confirm: {
+          type: "boolean",
+          description: "Must be true to confirm key expiry",
+        },
+      },
+      required: ["deviceId", "confirm"],
+    },
+  },
+  {
+    name: "tailscale_device_rename",
+    description:
+      "Set a custom display name for a device. This changes the device's 'given name' in Tailscale, not the machine hostname.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        deviceId: {
+          type: "string",
+          description: "Tailscale device ID",
+        },
+        name: {
+          type: "string",
+          description: "New display name for the device",
+        },
+      },
+      required: ["deviceId", "name"],
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -304,6 +354,36 @@ export async function handleDeviceTool(
           { value: parsed.value },
         );
         return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+
+      case "tailscale_device_expire": {
+        const parsed = DeviceExpireSchema.parse(args);
+        await client.postVoid(`/device/${parsed.deviceId}/key`, {
+          keyExpiryDisabled: false,
+        });
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({ expired: true, deviceId: parsed.deviceId }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "tailscale_device_rename": {
+        const parsed = DeviceRenameSchema.parse(args);
+        await client.postVoid(`/device/${parsed.deviceId}/name`, {
+          name: parsed.name,
+        });
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({ renamed: true, deviceId: parsed.deviceId, name: parsed.name }, null, 2),
+            },
+          ],
+        };
       }
 
       default:
