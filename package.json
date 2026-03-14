@@ -1,6 +1,6 @@
 {
   "name": "@itunified/mcp-tailscale",
-  "version": "2026.3.13",
+  "version": "2026.3.14",
   "description": "Slim Tailscale MCP Server — Devices, DNS/Split DNS, ACL, Keys, Tailnet management via Tailscale API v2",
   "type": "module",
   "main": "dist/index.js",
