@@ -20,7 +20,7 @@ You likely need a commercial license if:
 
 ## When You Do NOT Need a Commercial License
 
-- **Personal or internal use** — using the software as-is within your organization
+- **Personal or non-commercial use** — using the software for personal projects or non-commercial purposes
 - **Open-source projects** — integrating with other AGPL-3.0 or compatible open-source projects
 - **Unmodified use** — running the unmodified MCP server to manage your own Tailscale tailnet
 
@@ -35,10 +35,10 @@ Commercial licenses are priced based on scope and usage. Sponsoring the project 
 ## FAQ
 
 **Q: Can I use mcp-tailscale for free in my company?**
-A: Yes, as long as you comply with the AGPL-3.0 license terms (including making source code available if you modify it or offer it as a network service).
+A: Only if you fully comply with the AGPL-3.0 license terms, which requires making your complete source code available under AGPL-3.0. If your company uses mcp-tailscale internally for commercial operations and does not want to release its source code, a commercial license is required.
 
 **Q: Does the AGPL apply if I just run the MCP server internally?**
-A: Running the unmodified server internally for your own use does not trigger the AGPL network service clause. You do not need a commercial license for this use case.
+A: Running the server internally within a commercial organization requires either full AGPL-3.0 compliance (including releasing your source code) or a commercial license. The AGPL-3.0 free use is intended for personal and non-commercial purposes only.
 
 **Q: What if I build a product that includes mcp-tailscale?**
 A: If your product is proprietary (closed-source), you need a commercial license. If your product is also AGPL-3.0 licensed, you can use it under the open-source license.
