@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 This project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD.TS`).
 
 
+## v2026.03.14.7
+
+- Update design doc 001 status from Draft to Accepted (#19)
+
 ## v2026.03.14.6
 
 - **Tier 2 Enhancement: HTTP/SSE transport with Bearer token auth** (#14)
