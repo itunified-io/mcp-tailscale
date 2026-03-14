@@ -1,7 +1,7 @@
 # Design Doc 001: Tier 1 Enhancement — OAuth, Users, Webhooks, Tailnet Settings Write
 
 **Issue:** [#7](https://github.com/itunified-io/mcp-tailscale/issues/7)
-**Status:** Draft
+**Status:** Accepted
 **Date:** 2026-03-14
 
 ## Problem
