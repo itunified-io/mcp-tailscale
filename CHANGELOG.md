@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 This project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD.TS`).
 
 
+## v2026.03.14.6
+
+- **Tier 2 Enhancement: HTTP/SSE transport with Bearer token auth** (#14)
+  - Add SSE transport as opt-in alternative to stdio (`TAILSCALE_MCP_TRANSPORT=sse`)
+  - Mandatory `TAILSCALE_MCP_AUTH_TOKEN` for SSE — server refuses to start without it
+  - Timing-safe token comparison via `crypto.timingSafeEqual()`
+  - Add `express` dependency (runtime deps: 3 → 4)
+  - 188 unit tests (was 178)
+  - Design doc: `docs/plans/002-tier2-enhancement.md`
+
 ## v2026.03.14.5
 
 - **Tier 2 Enhancement: Device expire/rename + posture integration tools** (#13)
