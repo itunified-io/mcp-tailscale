@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 This project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD.TS`).
 
 
+## v2026.03.14.9
+
+- Add skill documentation to README and `.claude/skills/README.md` per ADR-0022 (#23)
+
 ## v2026.03.14.8
 
 - Add `docs/superpowers/` to `.gitignore` per ADR-0021 (#21)
