@@ -18,26 +18,28 @@
 
 Slim Tailscale MCP Server for managing devices, DNS/Split DNS, ACL policies, auth keys, users, webhooks, and tailnet settings via Tailscale API v2.
 
-**No SSH. No shell execution. API-only. 3 runtime dependencies.**
+**No SSH. No shell execution. API-only. 4 runtime dependencies.**
 
 ## Architecture
 
 ```
 src/
-  index.ts                   # MCP Server entry point (stdio transport only)
+  index.ts                   # MCP Server entry point (stdio + SSE transport)
+  transport.ts               # Transport config validation + auth middleware
   client/
     tailscale-client.ts      # Axios HTTP client (API key Bearer token auth)
     tailscale-oauth-client.ts # OAuth client credentials auth (auto-refresh)
     client-factory.ts        # Client selection (OAuth > API key) from env vars
     types.ts                 # Tailscale API v2 response types + ITailscaleClient interface
   tools/
-    devices.ts               # Device management tools (9 tools)
+    devices.ts               # Device management tools (11 tools)
     dns.ts                   # DNS nameservers, search paths, split DNS, preferences (8 tools)
     acl.ts                   # ACL policy management (5 tools)
     keys.ts                  # Auth key management (4 tools)
     tailnet.ts               # Tailnet settings (read/write), contacts, lock status (5 tools)
     users.ts                 # User management tools (2 tools)
     webhooks.ts              # Webhook management tools (4 tools)
+    posture.ts               # Posture integration tools (4 tools)
     diagnostics.ts           # Status, API verify, log streaming, DERP map (5 tools)
   utils/
     validation.ts            # Shared Zod schemas (device IDs, CIDR, domains, etc.)
@@ -71,13 +73,13 @@ docs/
 - Device endpoints: `/device/{deviceId}/` (not tailnet-scoped)
 
 ### Dependencies
-- **3 runtime dependencies only**: `@modelcontextprotocol/sdk`, `axios`, `zod`
+- **4 runtime dependencies**: `@modelcontextprotocol/sdk`, `axios`, `express`, `zod`
 - No SSH libraries, no Redis, no PostgreSQL
 - Dev: `typescript`, `vitest`, `@types/node`
 
 ## Security
 
-- **Transport**: stdio only (no SSE, no HTTP endpoint)
+- **Transport**: stdio (default) or SSE with mandatory Bearer token auth (`crypto.timingSafeEqual`)
 - **Authentication**: API Key exclusively via environment variables. Never hardcoded, logged, or committed.
 - **No SSH**: Exclusively Tailscale REST API v2
 - **Input validation**: Zod schemas for all tool parameters

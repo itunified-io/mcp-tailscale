@@ -15,12 +15,20 @@
     "type": "git",
     "url": "https://github.com/itunified-io/mcp-tailscale.git"
   },
-  "keywords": ["mcp", "tailscale", "dns", "split-dns", "tailnet", "vpn"],
+  "keywords": [
+    "mcp",
+    "tailscale",
+    "dns",
+    "split-dns",
+    "tailnet",
+    "vpn"
+  ],
   "author": "itunified-io",
   "license": "AGPL-3.0-only",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.7.0",
     "axios": "^1.7.0",
+    "express": "^5.2.1",
     "zod": "^3.24.0"
   },
   "devDependencies": {

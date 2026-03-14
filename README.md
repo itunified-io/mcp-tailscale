@@ -8,13 +8,14 @@
 
 Slim Tailscale MCP Server for managing devices, DNS/Split DNS, ACL policies, auth keys, users, webhooks, and tailnet settings via Tailscale API v2.
 
-**No SSH. No shell execution. API-only. 3 runtime dependencies.**
+**No SSH. No shell execution. API-only. 4 runtime dependencies.**
 
 ## Table of Contents
 
 - [Features](#features)
 - [Quick Start](#quick-start)
 - [Claude Code Integration](#claude-code-integration)
+- [SSE Transport](#sse-transport)
 - [Configuration](#configuration)
 - [Tools](#tools)
 - [Development](#development)
@@ -64,6 +65,20 @@ Add to `.mcp.json` in your project root:
   }
 }
 ```
+
+## SSE Transport
+
+By default, mcp-tailscale uses stdio transport. To enable HTTP/SSE:
+
+```bash
+export TAILSCALE_MCP_TRANSPORT=sse
+export TAILSCALE_MCP_AUTH_TOKEN=your-secret-token
+export TAILSCALE_MCP_PORT=3000      # optional, default: 3000
+export TAILSCALE_MCP_HOST=localhost  # optional, default: localhost
+node dist/index.js
+```
+
+All requests require `Authorization: Bearer <token>`. The server will not start without `TAILSCALE_MCP_AUTH_TOKEN`.
 
 ## Configuration
 
