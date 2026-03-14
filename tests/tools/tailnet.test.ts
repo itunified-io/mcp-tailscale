@@ -1,10 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
 import { tailnetToolDefinitions, handleTailnetTool } from "../../src/tools/tailnet.js";
-import type { TailscaleClient } from "../../src/client/tailscale-client.js";
+import type { ITailscaleClient } from "../../src/client/types.js";
 
 const TAILNET = "example.com";
 
-function mockClient(overrides: Partial<TailscaleClient> = {}): TailscaleClient {
+function mockClient(overrides: Partial<ITailscaleClient> = {}): ITailscaleClient {
   return {
     tailnet: TAILNET,
     get: vi.fn().mockResolvedValue({}),
@@ -15,7 +15,7 @@ function mockClient(overrides: Partial<TailscaleClient> = {}): TailscaleClient {
     deleteVoid: vi.fn().mockResolvedValue(undefined),
     postVoid: vi.fn().mockResolvedValue(undefined),
     ...overrides,
-  } as unknown as TailscaleClient;
+  } as unknown as ITailscaleClient;
 }
 
 // ---------------------------------------------------------------------------
@@ -23,8 +23,8 @@ function mockClient(overrides: Partial<TailscaleClient> = {}): TailscaleClient {
 // ---------------------------------------------------------------------------
 
 describe("Tailnet Tool Definitions", () => {
-  it("exports 4 tool definitions", () => {
-    expect(tailnetToolDefinitions).toHaveLength(4);
+  it("exports 5 tool definitions", () => {
+    expect(tailnetToolDefinitions).toHaveLength(5);
   });
 
   it("all tools have tailscale_tailnet_ prefix", () => {
@@ -185,6 +185,61 @@ describe("handleTailnetTool", () => {
       const result = await handleTailnetTool("tailscale_tailnet_lock_status", {}, client);
 
       expect(result.content[0].text).toContain("Error executing tailscale_tailnet_lock_status");
+    });
+  });
+
+  describe("tailscale_tailnet_settings_update", () => {
+    it("updates tailnet settings when confirmed", async () => {
+      const mockResult = {
+        devicesApprovalOn: true,
+        devicesAutoUpdatesOn: true,
+        devicesKeyDurationDays: 90,
+      };
+      const client = mockClient({ patch: vi.fn().mockResolvedValue(mockResult) });
+
+      const result = await handleTailnetTool("tailscale_tailnet_settings_update", {
+        devicesApprovalOn: true,
+        devicesKeyDurationDays: 90,
+        confirm: true,
+      }, client);
+
+      expect(result.content[0].text).toContain("devicesApprovalOn");
+      expect(client.patch).toHaveBeenCalledWith(
+        `/tailnet/${TAILNET}/settings`,
+        { devicesApprovalOn: true, devicesKeyDurationDays: 90 },
+      );
+    });
+
+    it("rejects settings update without confirm: true", async () => {
+      const client = mockClient();
+
+      const result = await handleTailnetTool("tailscale_tailnet_settings_update", {
+        devicesApprovalOn: true,
+        confirm: false,
+      }, client);
+
+      expect(result.content[0].text).toContain("Error executing tailscale_tailnet_settings_update");
+    });
+
+    it("requires confirm parameter", async () => {
+      const client = mockClient();
+
+      const result = await handleTailnetTool("tailscale_tailnet_settings_update", {
+        devicesApprovalOn: true,
+      }, client);
+
+      expect(result.content[0].text).toContain("Error executing tailscale_tailnet_settings_update");
+    });
+
+    it("handles API errors gracefully", async () => {
+      const client = mockClient({ patch: vi.fn().mockRejectedValue(new Error("Forbidden")) });
+
+      const result = await handleTailnetTool("tailscale_tailnet_settings_update", {
+        devicesApprovalOn: true,
+        confirm: true,
+      }, client);
+
+      expect(result.content[0].text).toContain("Error executing tailscale_tailnet_settings_update");
     });
   });
 

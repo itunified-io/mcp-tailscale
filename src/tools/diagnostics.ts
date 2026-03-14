@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { TailscaleClient } from "../client/tailscale-client.js";
+import type { ITailscaleClient } from "../client/types.js";
 import type { DeviceListResponse, DerpMap, LogStreamConfig } from "../client/types.js";
 
 // ---------------------------------------------------------------------------
@@ -114,7 +114,7 @@ export const diagnosticsToolDefinitions = [
 export async function handleDiagnosticsTool(
   name: string,
   args: Record<string, unknown>,
-  client: TailscaleClient,
+  client: ITailscaleClient,
 ): Promise<{ content: Array<{ type: "text"; text: string }> }> {
   try {
     switch (name) {

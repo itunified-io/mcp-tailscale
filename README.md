@@ -6,7 +6,7 @@
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen?style=flat-square)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?style=flat-square)](https://www.typescriptlang.org/)
 
-Slim Tailscale MCP Server for managing devices, DNS/Split DNS, ACL policies, auth keys, and tailnet settings via Tailscale API v2.
+Slim Tailscale MCP Server for managing devices, DNS/Split DNS, ACL policies, auth keys, users, webhooks, and tailnet settings via Tailscale API v2.
 
 **No SSH. No shell execution. API-only. 3 runtime dependencies.**
 
@@ -22,14 +22,18 @@ Slim Tailscale MCP Server for managing devices, DNS/Split DNS, ACL policies, aut
 
 ## Features
 
-35 tools across 6 domains:
+42 tools across 8 domains:
 
 - **Devices** — List, get, delete, authorize devices; manage routes, tags, and posture attributes
 - **DNS** — Global nameservers, search paths, split DNS configuration, MagicDNS preferences
 - **ACL** — Get, set, preview, validate, and test ACL policies
 - **Keys** — List, get, create, and revoke auth keys
-- **Tailnet** — Settings, contacts, Tailnet Lock status
+- **Tailnet** — Settings (read/write), contacts, Tailnet Lock status
+- **Users** — List and get tailnet users with role/type filtering
+- **Webhooks** — Create, list, get, and delete webhook endpoints
 - **Diagnostics** — Tailnet status summary, API connectivity check, log streaming, DERP map
+
+**Authentication:** API key or OAuth client credentials (auto-refresh)
 
 ## Quick Start
 
@@ -53,7 +57,8 @@ Add to `.mcp.json` in your project root:
       "env": {
         "TAILSCALE_API_KEY": "your-api-key-here",
         "TAILSCALE_TAILNET": "your-tailnet-name"
-      }
+      },
+      "comment": "Or use OAuth: TAILSCALE_OAUTH_CLIENT_ID + TAILSCALE_OAUTH_CLIENT_SECRET instead of TAILSCALE_API_KEY"
     }
   }
 }
@@ -63,14 +68,20 @@ Add to `.mcp.json` in your project root:
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `TAILSCALE_API_KEY` | Yes | — | Tailscale API key (from admin console > Settings > Keys) |
+| `TAILSCALE_API_KEY` | Yes* | — | Tailscale API key (from admin console > Settings > Keys) |
+| `TAILSCALE_OAUTH_CLIENT_ID` | Yes* | — | OAuth client ID (from admin console > Settings > OAuth) |
+| `TAILSCALE_OAUTH_CLIENT_SECRET` | Yes* | — | OAuth client secret |
 | `TAILSCALE_TAILNET` | Yes | — | Tailnet name (e.g., `example.com` or your org name) |
 | `TAILSCALE_API_URL` | No | `https://api.tailscale.com` | API base URL (override for testing) |
 | `TAILSCALE_TIMEOUT` | No | `30000` | Request timeout in milliseconds |
 
-### API Key Permissions
+*\*Either `TAILSCALE_API_KEY` or both `TAILSCALE_OAUTH_CLIENT_ID` + `TAILSCALE_OAUTH_CLIENT_SECRET` must be set. OAuth takes priority when both are configured.*
 
-Create an API key at `login.tailscale.com/admin/settings/keys`. The key needs read/write access to the resources you want to manage.
+### Authentication
+
+**API Key:** Create at `login.tailscale.com/admin/settings/keys`. The key needs read/write access to the resources you want to manage.
+
+**OAuth Client Credentials:** Create at `login.tailscale.com/admin/settings/oauth`. OAuth tokens auto-refresh before expiry. Recommended for automated/service integrations.
 
 ## Tools
 
@@ -120,14 +131,31 @@ Create an API key at `login.tailscale.com/admin/settings/keys`. The key needs re
 | `tailscale_key_create` | Create a new auth key |
 | `tailscale_key_delete` | Delete an auth key (requires `confirm: true`) |
 
-### Tailnet (4 tools)
+### Tailnet (5 tools)
 
 | Tool | Description |
 |------|-------------|
 | `tailscale_tailnet_settings_get` | Get tailnet settings |
+| `tailscale_tailnet_settings_update` | Update tailnet settings (requires `confirm: true`) |
 | `tailscale_tailnet_contacts_get` | Get tailnet contact emails |
 | `tailscale_tailnet_contacts_set` | Update tailnet contacts (requires `confirm: true`) |
 | `tailscale_tailnet_lock_status` | Get Tailnet Lock status |
+
+### Users (2 tools)
+
+| Tool | Description |
+|------|-------------|
+| `tailscale_user_list` | List all users (filter by type/role) |
+| `tailscale_user_get` | Get user details by ID |
+
+### Webhooks (4 tools)
+
+| Tool | Description |
+|------|-------------|
+| `tailscale_webhook_list` | List all webhook endpoints |
+| `tailscale_webhook_create` | Create a webhook endpoint |
+| `tailscale_webhook_get` | Get webhook details by ID |
+| `tailscale_webhook_delete` | Delete a webhook (requires `confirm: true`) |
 
 ### Diagnostics (5 tools)
 

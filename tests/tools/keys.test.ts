@@ -1,11 +1,11 @@
 import { describe, it, expect, vi } from "vitest";
 import { keyToolDefinitions, handleKeyTool } from "../../src/tools/keys.js";
-import type { TailscaleClient } from "../../src/client/tailscale-client.js";
+import type { ITailscaleClient } from "../../src/client/types.js";
 
 const TAILNET = "example.com";
 const KEY_ID = "k12345abcdef";
 
-function mockClient(overrides: Partial<TailscaleClient> = {}): TailscaleClient {
+function mockClient(overrides: Partial<ITailscaleClient> = {}): TailscaleClient {
   return {
     tailnet: TAILNET,
     get: vi.fn().mockResolvedValue({}),
@@ -16,7 +16,7 @@ function mockClient(overrides: Partial<TailscaleClient> = {}): TailscaleClient {
     deleteVoid: vi.fn().mockResolvedValue(undefined),
     postVoid: vi.fn().mockResolvedValue(undefined),
     ...overrides,
-  } as unknown as TailscaleClient;
+  } as unknown as ITailscaleClient;
 }
 
 // ---------------------------------------------------------------------------

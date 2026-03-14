@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { TailscaleClient } from "../client/tailscale-client.js";
+import type { ITailscaleClient } from "../client/types.js";
 import type {
   TailnetSettings,
   TailnetContacts,
@@ -36,6 +36,20 @@ const TailnetContactsSetSchema = z.object({
 });
 
 const TailnetLockStatusSchema = z.object({});
+
+const TailnetSettingsUpdateSchema = z.object({
+  devicesApprovalOn: z.boolean().optional(),
+  devicesAutoUpdatesOn: z.boolean().optional(),
+  devicesKeyDurationDays: z.number().int().positive().optional(),
+  usersApprovalOn: z.boolean().optional(),
+  usersRoleAllowedToJoinExternalTailnets: z.string().optional(),
+  networkFlowLoggingOn: z.boolean().optional(),
+  regionalRoutingOn: z.boolean().optional(),
+  postureIdentityCollectionOn: z.boolean().optional(),
+  confirm: z.literal(true, {
+    errorMap: () => ({ message: "confirm must be true to update tailnet settings" }),
+  }),
+});
 
 // ---------------------------------------------------------------------------
 // Tool definitions (for ListTools)
@@ -108,6 +122,53 @@ export const tailnetToolDefinitions = [
       properties: {},
     },
   },
+  {
+    name: "tailscale_tailnet_settings_update",
+    description:
+      "Update tailnet settings. Requires confirm: true. All settings fields are optional — only provided fields will be updated.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        devicesApprovalOn: {
+          type: "boolean",
+          description: "Whether devices require admin approval before they can join the tailnet",
+        },
+        devicesAutoUpdatesOn: {
+          type: "boolean",
+          description: "Whether devices are automatically updated",
+        },
+        devicesKeyDurationDays: {
+          type: "number",
+          description: "Number of days before device keys expire",
+        },
+        usersApprovalOn: {
+          type: "boolean",
+          description: "Whether users require admin approval to join the tailnet",
+        },
+        usersRoleAllowedToJoinExternalTailnets: {
+          type: "string",
+          description: "Role allowed to join external tailnets",
+        },
+        networkFlowLoggingOn: {
+          type: "boolean",
+          description: "Whether network flow logging is enabled",
+        },
+        regionalRoutingOn: {
+          type: "boolean",
+          description: "Whether regional routing is enabled",
+        },
+        postureIdentityCollectionOn: {
+          type: "boolean",
+          description: "Whether posture identity collection is enabled",
+        },
+        confirm: {
+          type: "boolean",
+          description: "Must be true to confirm updating tailnet settings",
+        },
+      },
+      required: ["confirm"],
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -117,7 +178,7 @@ export const tailnetToolDefinitions = [
 export async function handleTailnetTool(
   name: string,
   args: Record<string, unknown>,
-  client: TailscaleClient,
+  client: ITailscaleClient,
 ): Promise<{ content: Array<{ type: "text"; text: string }> }> {
   try {
     switch (name) {
@@ -154,6 +215,24 @@ export async function handleTailnetTool(
         TailnetLockStatusSchema.parse(args);
         const result = await client.get<TailnetLockStatus>(
           `/tailnet/${client.tailnet}/lock/status`,
+        );
+        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+      }
+
+      case "tailscale_tailnet_settings_update": {
+        const parsed = TailnetSettingsUpdateSchema.parse(args);
+        const body: Record<string, unknown> = {};
+        if (parsed.devicesApprovalOn !== undefined) body["devicesApprovalOn"] = parsed.devicesApprovalOn;
+        if (parsed.devicesAutoUpdatesOn !== undefined) body["devicesAutoUpdatesOn"] = parsed.devicesAutoUpdatesOn;
+        if (parsed.devicesKeyDurationDays !== undefined) body["devicesKeyDurationDays"] = parsed.devicesKeyDurationDays;
+        if (parsed.usersApprovalOn !== undefined) body["usersApprovalOn"] = parsed.usersApprovalOn;
+        if (parsed.usersRoleAllowedToJoinExternalTailnets !== undefined) body["usersRoleAllowedToJoinExternalTailnets"] = parsed.usersRoleAllowedToJoinExternalTailnets;
+        if (parsed.networkFlowLoggingOn !== undefined) body["networkFlowLoggingOn"] = parsed.networkFlowLoggingOn;
+        if (parsed.regionalRoutingOn !== undefined) body["regionalRoutingOn"] = parsed.regionalRoutingOn;
+        if (parsed.postureIdentityCollectionOn !== undefined) body["postureIdentityCollectionOn"] = parsed.postureIdentityCollectionOn;
+        const result = await client.patch<TailnetSettings>(
+          `/tailnet/${client.tailnet}/settings`,
+          body,
         );
         return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
       }

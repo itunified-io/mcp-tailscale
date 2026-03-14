@@ -3,7 +3,7 @@
 This document maps MCP tools to the Tailscale API v2 endpoints they use.
 
 Base URL: `https://api.tailscale.com/api/v2`
-Authentication: `Authorization: Bearer <api-key>`
+Authentication: `Authorization: Bearer <api-key>` or OAuth client credentials
 
 ## Devices
 
@@ -59,6 +59,23 @@ Authentication: `Authorization: Bearer <api-key>`
 | `tailscale_tailnet_contacts_get` | GET | `/tailnet/{tailnet}/contacts` |
 | `tailscale_tailnet_contacts_set` | PATCH | `/tailnet/{tailnet}/contacts` |
 | `tailscale_tailnet_lock_status` | GET | `/tailnet/{tailnet}/lock/status` |
+| `tailscale_tailnet_settings_update` | PATCH | `/tailnet/{tailnet}/settings` |
+
+## Users
+
+| Tool | Method | Endpoint |
+|------|--------|----------|
+| `tailscale_user_list` | GET | `/tailnet/{tailnet}/users` |
+| `tailscale_user_get` | GET | `/users/{userId}` |
+
+## Webhooks
+
+| Tool | Method | Endpoint |
+|------|--------|----------|
+| `tailscale_webhook_list` | GET | `/tailnet/{tailnet}/webhooks` |
+| `tailscale_webhook_create` | POST | `/tailnet/{tailnet}/webhooks` |
+| `tailscale_webhook_get` | GET | `/webhooks/{webhookId}` |
+| `tailscale_webhook_delete` | DELETE | `/webhooks/{webhookId}` |
 
 ## Diagnostics
 
@@ -75,5 +92,6 @@ Authentication: `Authorization: Bearer <api-key>`
 - **Tailnet identifier**: Use your organization's tailnet name (e.g., `example.com`) or `-` for the default tailnet. Set via `TAILSCALE_TAILNET` environment variable.
 - **Device IDs**: Tailscale device IDs are numeric strings. Obtain them via `tailscale_device_list`.
 - **Response format**: The Tailscale API returns direct JSON objects (no `{ success, result }` wrapper like some other APIs).
-- **Destructive operations**: `tailscale_device_delete`, `tailscale_key_delete`, `tailscale_acl_set`, `tailscale_tailnet_contacts_set`, and `tailscale_log_stream_set` require `confirm: true`.
-- **PATCH vs POST**: Split DNS uses PATCH (partial update), while nameservers and search paths use POST (full replacement).
+- **Authentication**: Supports API key (`TAILSCALE_API_KEY`) or OAuth client credentials (`TAILSCALE_OAUTH_CLIENT_ID` + `TAILSCALE_OAUTH_CLIENT_SECRET`). OAuth takes priority when both are configured.
+- **Destructive operations**: `tailscale_device_delete`, `tailscale_key_delete`, `tailscale_acl_set`, `tailscale_tailnet_contacts_set`, `tailscale_tailnet_settings_update`, `tailscale_log_stream_set`, and `tailscale_webhook_delete` require `confirm: true`.
+- **PATCH vs POST**: Split DNS and tailnet settings use PATCH (partial update), while nameservers and search paths use POST (full replacement).
