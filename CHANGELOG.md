@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 This project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD.TS`).
 
 
+## v2026.03.14.2
+
+- Clarify license: internal/commercial use requires commercial license (#5)
+
 ## v2026.03.14.1
 
 - 35 tools across 6 domains: Devices (9), DNS (8), ACL (5), Keys (4), Tailnet (4), Diagnostics (5) (#1)
