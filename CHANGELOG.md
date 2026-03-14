@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 This project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD.TS`).
 
 
+## v2026.03.14.8
+
+- Add `docs/superpowers/` to `.gitignore` per ADR-0021 (#21)
+
 ## v2026.03.14.7
 
 - Update design doc 001 status from Draft to Accepted (#19)
