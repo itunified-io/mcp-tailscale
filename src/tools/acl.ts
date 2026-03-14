@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { TailscaleClient } from "../client/tailscale-client.js";
+import type { ITailscaleClient } from "../client/types.js";
 import type {
   AclPolicy,
   AclPreviewResult,
@@ -163,7 +163,7 @@ export const aclToolDefinitions = [
 export async function handleAclTool(
   name: string,
   args: Record<string, unknown>,
-  client: TailscaleClient,
+  client: ITailscaleClient,
 ): Promise<{ content: Array<{ type: "text"; text: string }> }> {
   try {
     switch (name) {

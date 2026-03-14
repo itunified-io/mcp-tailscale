@@ -16,7 +16,7 @@
 
 ## Project Overview
 
-Slim Tailscale MCP Server for managing devices, DNS/Split DNS, ACL policies, auth keys, and tailnet settings via Tailscale API v2.
+Slim Tailscale MCP Server for managing devices, DNS/Split DNS, ACL policies, auth keys, users, webhooks, and tailnet settings via Tailscale API v2.
 
 **No SSH. No shell execution. API-only. 3 runtime dependencies.**
 
@@ -26,20 +26,25 @@ Slim Tailscale MCP Server for managing devices, DNS/Split DNS, ACL policies, aut
 src/
   index.ts                   # MCP Server entry point (stdio transport only)
   client/
-    tailscale-client.ts      # Axios HTTP client (Bearer token auth, error handling)
-    types.ts                 # Tailscale API v2 response types
+    tailscale-client.ts      # Axios HTTP client (API key Bearer token auth)
+    tailscale-oauth-client.ts # OAuth client credentials auth (auto-refresh)
+    client-factory.ts        # Client selection (OAuth > API key) from env vars
+    types.ts                 # Tailscale API v2 response types + ITailscaleClient interface
   tools/
     devices.ts               # Device management tools (9 tools)
     dns.ts                   # DNS nameservers, search paths, split DNS, preferences (8 tools)
     acl.ts                   # ACL policy management (5 tools)
     keys.ts                  # Auth key management (4 tools)
-    tailnet.ts               # Tailnet settings, contacts, lock status (4 tools)
+    tailnet.ts               # Tailnet settings (read/write), contacts, lock status (5 tools)
+    users.ts                 # User management tools (2 tools)
+    webhooks.ts              # Webhook management tools (4 tools)
     diagnostics.ts           # Status, API verify, log streaming, DERP map (5 tools)
   utils/
     validation.ts            # Shared Zod schemas (device IDs, CIDR, domains, etc.)
     errors.ts                # Tailscale error extraction and TailscaleApiError
 tests/                       # Vitest unit tests
 docs/
+  plans/                     # Design/plan documents
   api-reference.md           # Tailscale API v2 endpoint mapping
 ```
 

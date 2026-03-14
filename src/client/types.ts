@@ -7,6 +7,33 @@ export interface TailscaleConfig {
   timeout?: number;
 }
 
+export interface OAuthConfig {
+  clientId: string;
+  clientSecret: string;
+  tailnet: string;
+  apiUrl?: string;
+  timeout?: number;
+}
+
+export interface OAuthTokenResponse {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  scope?: string;
+}
+
+/** Common interface for both API key and OAuth clients */
+export interface ITailscaleClient {
+  readonly tailnet: string;
+  get<T>(path: string, params?: Record<string, unknown>): Promise<T>;
+  post<T>(path: string, data?: unknown): Promise<T>;
+  put<T>(path: string, data?: unknown): Promise<T>;
+  patch<T>(path: string, data?: unknown): Promise<T>;
+  delete<T>(path: string): Promise<T>;
+  deleteVoid(path: string): Promise<void>;
+  postVoid(path: string, data?: unknown): Promise<void>;
+}
+
 // Device types
 export interface Device {
   id: string;
@@ -221,4 +248,58 @@ export interface DevicePostureResponse {
 export interface DeviceRoutes {
   advertisedRoutes: string[];
   enabledRoutes: string[];
+}
+
+// User types
+export interface TailscaleUser {
+  id: string;
+  displayName: string;
+  loginName: string;
+  profilePicURL: string;
+  tailnetId: string;
+  created: string;
+  type: "member" | "shared";
+  role: "owner" | "admin" | "member" | "auditor" | "it-admin" | "network-admin" | "billing-admin";
+  status: "active" | "idle" | "suspended";
+  deviceCount: number;
+  lastSeen: string;
+  currentlyConnected: boolean;
+}
+
+export interface UserListResponse {
+  users: TailscaleUser[];
+}
+
+// Webhook types
+export interface TailscaleWebhook {
+  endpointId: string;
+  endpointUrl: string;
+  providerType: "slack" | "mattermost" | "googlechat" | "discord" | "generic";
+  creatorId: string;
+  created: string;
+  lastModified: string;
+  subscriptions: string[];
+  secret?: string;
+}
+
+export interface WebhookListResponse {
+  webhooks: TailscaleWebhook[];
+}
+
+export interface WebhookCreateRequest {
+  endpointUrl: string;
+  providerType?: "slack" | "mattermost" | "googlechat" | "discord" | "generic";
+  subscriptions: string[];
+}
+
+// Tailnet settings update (partial)
+export interface TailnetSettingsUpdate {
+  devicesApprovalOn?: boolean;
+  devicesAutoUpdatesOn?: boolean;
+  devicesKeyDurationDays?: number;
+  usersApprovalOn?: boolean;
+  usersRoleAllowedToJoinExternalTailnets?: string;
+  networkFlowLoggingOn?: boolean;
+  regionalRoutingOn?: boolean;
+  postureIdentityCollectionOn?: boolean;
 }
