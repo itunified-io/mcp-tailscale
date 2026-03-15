@@ -5,7 +5,7 @@
 [![CalVer](https://img.shields.io/badge/calver-YYYY.0M.DD.MICRO-22bfae?style=flat-square)](https://calver.org)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen?style=flat-square)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?style=flat-square)](https://www.typescriptlang.org/)
-[![Glama](https://glama.ai/mcp/servers/itunified-io/mcp-tailscale/badges/score.svg)](https://glama.ai/mcp/servers/itunified-io/mcp-tailscale)
+[![mcp-tailscale MCP server](https://glama.ai/mcp/servers/itunified-io/mcp-tailscale/badges/card.svg)](https://glama.ai/mcp/servers/itunified-io/mcp-tailscale)
 
 Slim Tailscale MCP Server for managing devices, DNS/Split DNS, ACL policies, auth keys, users, webhooks, and tailnet settings via Tailscale API v2.
 
