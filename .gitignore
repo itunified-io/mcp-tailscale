@@ -141,5 +141,5 @@ vite.config.ts.timestamp-*
 # Superpowers plugin working artifacts (ADR-0021)
 docs/superpowers/
 
-# MCP Registry tokens
+# MCP Registry tokens (ADR-0024)
 .mcpregistry_*

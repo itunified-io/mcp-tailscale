@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 This project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD.TS`).
 
 
+## v2026.03.16.2
+
+- Add ADR-0024 reference to `.gitignore` and MCP Registry Tokens entry to CLAUDE.md security section (#35)
+
 ## v2026.03.16.1
 
 - Register on official MCP Registry as `io.github.itunified-io/tailscale` (#12)
