@@ -60,7 +60,7 @@ describe("handleWebhookTool", () => {
           {
             endpointId: "wh_123",
             endpointUrl: "https://hooks.example.com/tailscale",
-            providerType: "generic",
+            providerType: "slack",
             subscriptions: ["nodeCreated", "nodeDeleted"],
           },
         ],
@@ -110,7 +110,7 @@ describe("handleWebhookTool", () => {
       );
     });
 
-    it("defaults providerType to generic", async () => {
+    it("omits providerType when not specified", async () => {
       const client = mockClient({ post: vi.fn().mockResolvedValue({}) });
 
       await handleWebhookTool("tailscale_webhook_create", {
@@ -118,10 +118,8 @@ describe("handleWebhookTool", () => {
         subscriptions: ["policyUpdate"],
       }, client);
 
-      expect(client.post).toHaveBeenCalledWith(
-        `/tailnet/${TAILNET}/webhooks`,
-        expect.objectContaining({ providerType: "generic" }),
-      );
+      const callArgs = (client.post as ReturnType<typeof vi.fn>).mock.calls[0];
+      expect(callArgs[1]).not.toHaveProperty("providerType");
     });
 
     it("requires endpointUrl", async () => {
@@ -184,7 +182,7 @@ describe("handleWebhookTool", () => {
       const mockWebhook = {
         endpointId: "wh_789",
         endpointUrl: "https://hooks.example.com/tailscale",
-        providerType: "generic",
+        providerType: "slack",
       };
       const client = mockClient({ get: vi.fn().mockResolvedValue(mockWebhook) });
 
