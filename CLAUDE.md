@@ -86,7 +86,7 @@ docs/
 - **Error handling**: No credential leaks in error messages (Bearer token never appears in logs or errors)
 - **Credentials**: Never hardcoded, never logged, never in git
 - **Secret Redaction — MANDATORY**: When using `grep`, `cat`, `sed`, `awk`, shell scripts, or any tool that reads/displays file contents containing secrets (`.env`, credentials, API keys, tokens, passwords), **ALWAYS redact the secret values** in output. Never display raw secret values in terminal output, logs, conversation context, or commit messages.
-- **MCP Registry Tokens**: `.mcpregistry_*` files are gitignored (ADR-0024). Never commit registry auth tokens.
+- **MCP Registry Tokens**: `.mcpregistry_*` files are gitignored (ADR-0024) AND npmignored. Never commit or publish registry auth tokens.
 - **Public Repo Documentation Policy — MANDATORY**: This is a **public repository**. All documentation, code examples, test data, and commit messages MUST use only generic placeholders:
   - Tailnet names: `your-tailnet-name`, `example.com`
   - Device IDs: `123456789`
@@ -132,6 +132,7 @@ docs/
 - Ensure `npm run build` succeeds before publishing
 - Verify with `npm view tailscale-mcp version` after publishing
 - Auth: granular access token set via `npm config set //registry.npmjs.org/:_authToken TOKEN`
+- **`.npmignore` MUST exclude** `.mcpregistry_*` files (ADR-0024) — verify before every publish that tokens are not in tarball
 
 ## Git Workflow
 
