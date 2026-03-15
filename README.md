@@ -1,5 +1,7 @@
 # mcp-tailscale
 
+**Secure MCP access for private infrastructure over Tailscale**
+
 [![GitHub release](https://img.shields.io/github/v/release/itunified-io/mcp-tailscale?style=flat-square)](https://github.com/itunified-io/mcp-tailscale/releases)
 [![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue?style=flat-square)](LICENSE)
 [![CalVer](https://img.shields.io/badge/calver-YYYY.0M.DD.MICRO-22bfae?style=flat-square)](https://calver.org)
@@ -7,37 +9,25 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?style=flat-square)](https://www.typescriptlang.org/)
 [![mcp-tailscale MCP server](https://glama.ai/mcp/servers/itunified-io/mcp-tailscale/badges/card.svg)](https://glama.ai/mcp/servers/itunified-io/mcp-tailscale)
 
-Slim Tailscale MCP Server for managing devices, DNS/Split DNS, ACL policies, auth keys, users, webhooks, and tailnet settings via Tailscale API v2.
+## The Problem
+
+AI agents need access to internal tools, services, and infrastructure — but exposing private systems to the internet creates unacceptable security risks. VPNs are complex, SSH tunnels are fragile, and API gateways add latency and maintenance overhead.
+
+**mcp-tailscale** bridges this gap: a lightweight MCP server that gives AI agents secure, authenticated access to your Tailscale-connected infrastructure — without exposing anything to the public internet.
+
+## What It Does
+
+mcp-tailscale is an MCP Gateway Runtime that connects AI agents (Claude, GPT, custom) to your private infrastructure through Tailscale's zero-trust network. It provides **48 tools across 9 domains** for managing devices, DNS, ACL policies, auth keys, users, webhooks, posture integrations, and tailnet settings — all through the Tailscale API v2.
 
 **No SSH. No shell execution. API-only. 4 runtime dependencies.**
 
-## Table of Contents
+## Use Cases
 
-- [Features](#features)
-- [Quick Start](#quick-start)
-- [Claude Code Integration](#claude-code-integration)
-- [Skills](#skills)
-- [SSE Transport](#sse-transport)
-- [Configuration](#configuration)
-- [Tools](#tools)
-- [Development](#development)
-- [License](#license)
-
-## Features
-
-48 tools across 9 domains:
-
-- **Devices** — List, get, delete, authorize, expire, rename devices; manage routes, tags, and posture attributes
-- **DNS** — Global nameservers, search paths, split DNS configuration, MagicDNS preferences
-- **ACL** — Get, set, preview, validate, and test ACL policies
-- **Keys** — List, get, create, and revoke auth keys
-- **Tailnet** — Settings (read/write), contacts, Tailnet Lock status
-- **Users** — List and get tailnet users with role/type filtering
-- **Webhooks** — Create, list, get, and delete webhook endpoints
-- **Posture Integrations** — List, get, create, and delete third-party posture provider integrations
-- **Diagnostics** — Tailnet status summary, API connectivity check, log streaming, DERP map
-
-**Authentication:** API key or OAuth client credentials (auto-refresh)
+- **DevOps Automation** — Let AI agents manage device authorization, subnet routes, and ACL policies across your tailnet
+- **DNS Management** — Configure split DNS, global nameservers, and MagicDNS through natural language
+- **Security Auditing** — Automated ACL policy validation, posture compliance checks, and key rotation
+- **Fleet Management** — Monitor device status, manage tags, and onboard new devices at scale
+- **Infrastructure as Conversation** — Query and modify your private network configuration through AI-driven workflows
 
 ## Quick Start
 
@@ -67,6 +57,22 @@ Add to `.mcp.json` in your project root:
   }
 }
 ```
+
+## Features
+
+48 tools across 9 domains:
+
+- **Devices** — List, get, delete, authorize, expire, rename devices; manage routes, tags, and posture attributes
+- **DNS** — Global nameservers, search paths, split DNS configuration, MagicDNS preferences
+- **ACL** — Get, set, preview, validate, and test ACL policies
+- **Keys** — List, get, create, and revoke auth keys
+- **Tailnet** — Settings (read/write), contacts, Tailnet Lock status
+- **Users** — List and get tailnet users with role/type filtering
+- **Webhooks** — Create, list, get, and delete webhook endpoints
+- **Posture Integrations** — List, get, create, and delete third-party posture provider integrations
+- **Diagnostics** — Tailnet status summary, API connectivity check, log streaming, DERP map
+
+**Authentication:** API key or OAuth client credentials (auto-refresh)
 
 ## Skills
 
@@ -210,6 +216,14 @@ All requests require `Authorization: Bearer <token>`. The server will not start 
 | `tailscale_log_stream_set` | Set log streaming configuration (requires `confirm: true`) |
 | `tailscale_derp_map` | Get DERP relay map |
 
+## Architecture
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed architecture diagrams and component descriptions.
+
+## Roadmap
+
+See [ROADMAP.md](ROADMAP.md) for the product development roadmap.
+
 ## Development
 
 ```bash
@@ -220,6 +234,37 @@ npm run typecheck  # Type check only (no emit)
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 See [docs/api-reference.md](docs/api-reference.md) for the Tailscale API v2 endpoint mapping.
+
+## Open Source
+
+mcp-tailscale is the community edition — a fully functional MCP Gateway Runtime under AGPL-3.0. Self-host it, contribute to it, build on it.
+
+What you get with the open-source edition:
+
+- Complete Tailscale API v2 coverage (48 tools, 9 domains)
+- stdio and SSE transport
+- API key and OAuth authentication
+- Zod-validated inputs, structured error handling
+- Claude Code skills for common workflows
+- Full test suite (vitest)
+
+## Commercial
+
+For organizations that need governance, compliance, and multi-tenant capabilities on top of the open-source runtime, we offer commercial editions with enterprise features.
+
+**Planned enterprise capabilities:**
+
+- Role-based access control (RBAC)
+- OIDC/SAML single sign-on
+- Audit event logging
+- Policy engine for tool access control
+- Multi-tenant isolation
+- Commercial license (no AGPL obligations)
+- Priority support and SLA
+
+See [PRODUCT_PACKAGING.md](PRODUCT_PACKAGING.md) for tier details.
+
+Contact us: [GitHub Sponsors](https://github.com/sponsors/itunified-io)
 
 ## License
 

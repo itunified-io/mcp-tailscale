@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 This project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD.TS`).
 
 
+## v2026.03.15.4
+
+- Add product positioning docs: restructured README, ROADMAP.md, ARCHITECTURE.md, PRODUCT_PACKAGING.md (#29)
+
 ## v2026.03.15.3
 
 - Switch Glama badge from score to card format (#11)
