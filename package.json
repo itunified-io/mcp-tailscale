@@ -5,6 +5,14 @@
   "description": "Secure MCP access for private infrastructure over Tailscale — 48 tools for devices, DNS, ACL, keys, users, webhooks, posture, and tailnet management via Tailscale API v2",
   "type": "module",
   "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./server": "./dist/server.js",
+    "./types": "./dist/types.js",
+    "./client/*": "./dist/client/*.js",
+    "./utils/*": "./dist/utils/*.js",
+    "./transport": "./dist/transport.js"
+  },
   "bin": {
     "mcp-tailscale": "dist/index.js"
   },
