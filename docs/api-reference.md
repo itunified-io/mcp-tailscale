@@ -42,7 +42,7 @@ Authentication: `Authorization: Bearer <api-key>` or OAuth client credentials
 | `tailscale_acl_set` | POST | `/tailnet/{tailnet}/acl` |
 | `tailscale_acl_preview` | POST | `/tailnet/{tailnet}/acl/preview` |
 | `tailscale_acl_validate` | POST | `/tailnet/{tailnet}/acl/validate` |
-| `tailscale_acl_test` | POST | `/tailnet/{tailnet}/acl/test` |
+| `tailscale_acl_test` | POST | `/tailnet/{tailnet}/acl/validate` (shared with acl_validate) |
 
 ## Auth Keys
 

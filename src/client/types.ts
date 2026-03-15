@@ -133,14 +133,6 @@ export interface AclValidationResult {
   message: string;
 }
 
-export interface AclTestResult {
-  results: Array<{
-    user: string;
-    errors: string[];
-    passed: boolean;
-  }>;
-}
-
 // Key types
 export interface AuthKey {
   id: string;

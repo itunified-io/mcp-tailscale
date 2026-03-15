@@ -4,7 +4,6 @@ import type {
   AclPolicy,
   AclPreviewResult,
   AclValidationResult,
-  AclTestResult,
 } from "../client/types.js";
 
 // ---------------------------------------------------------------------------
@@ -142,7 +141,7 @@ export const aclToolDefinitions = [
   {
     name: "tailscale_acl_test",
     description:
-      "Run ACL tests defined in the policy's 'tests' field. Returns pass/fail results for each test case.",
+      "Run ACL tests defined in the policy's 'tests' field by validating the policy. Returns validation results including test pass/fail outcomes.",
     inputSchema: {
       type: "object" as const,
       properties: {
@@ -207,8 +206,8 @@ export async function handleAclTool(
 
       case "tailscale_acl_test": {
         const parsed = AclTestSchema.parse(args);
-        const result = await client.post<AclTestResult>(
-          `/tailnet/${client.tailnet}/acl/test`,
+        const result = await client.post<AclValidationResult>(
+          `/tailnet/${client.tailnet}/acl/validate`,
           parsed.policy,
         );
         return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
