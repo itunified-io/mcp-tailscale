@@ -24,7 +24,7 @@ const WEBHOOK_EVENT_TYPES = [
   "exitNodeIPForwardingNotEnabled",
 ] as const;
 
-const PROVIDER_TYPES = ["slack", "mattermost", "googlechat", "discord", "generic"] as const;
+const PROVIDER_TYPES = ["slack", "mattermost", "googlechat", "discord"] as const;
 
 // ---------------------------------------------------------------------------
 // Zod schemas for input validation
@@ -34,7 +34,7 @@ const WebhookListSchema = z.object({});
 
 const WebhookCreateSchema = z.object({
   endpointUrl: z.string().url("Must be a valid URL"),
-  providerType: z.enum(PROVIDER_TYPES).optional().default("generic"),
+  providerType: z.enum(PROVIDER_TYPES).optional(),
   subscriptions: z
     .array(z.enum(WEBHOOK_EVENT_TYPES))
     .min(1, "At least one subscription event type is required"),
@@ -78,8 +78,8 @@ export const webhookToolDefinitions = [
         },
         providerType: {
           type: "string",
-          enum: ["slack", "mattermost", "googlechat", "discord", "generic"],
-          description: "The webhook provider type (default: generic)",
+          enum: ["slack", "mattermost", "googlechat", "discord"],
+          description: "The webhook provider type (optional, omit for default Tailscale format)",
         },
         subscriptions: {
           type: "array",
@@ -156,13 +156,14 @@ export async function handleWebhookTool(
 
       case "tailscale_webhook_create": {
         const parsed = WebhookCreateSchema.parse(args);
+        const body: Record<string, unknown> = {
+          endpointUrl: parsed.endpointUrl,
+          subscriptions: parsed.subscriptions,
+        };
+        if (parsed.providerType) body.providerType = parsed.providerType;
         const result = await client.post<TailscaleWebhook>(
           `/tailnet/${client.tailnet}/webhooks`,
-          {
-            endpointUrl: parsed.endpointUrl,
-            providerType: parsed.providerType,
-            subscriptions: parsed.subscriptions,
-          },
+          body,
         );
         return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
       }
