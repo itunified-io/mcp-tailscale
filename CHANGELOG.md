@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 This project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD.TS`).
 
 
+## v2026.03.15.1
+
+- fix: use `/acl/validate` endpoint for `acl_test` tool — nonexistent `/acl/test` returned 404 (#17)
+- fix: remove unsupported `"generic"` webhook provider type, make `providerType` optional (#18)
+
 ## v2026.03.14.9
 
 - Add skill documentation to README and `.claude/skills/README.md` per ADR-0022 (#23)
