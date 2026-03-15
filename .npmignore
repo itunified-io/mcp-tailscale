@@ -1,0 +1,22 @@
+# Source (compiled output in dist/ is included)
+src/
+tests/
+docs/
+
+# Config
+tsconfig.json
+.env
+.env.*
+!.env.example
+.claude/
+.github/
+
+# Dev files
+*.tsbuildinfo
+.eslintcache
+coverage/
+.nyc_output/
+*.tgz
+
+# Superpowers
+docs/superpowers/

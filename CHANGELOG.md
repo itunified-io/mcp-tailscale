@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 This project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD.TS`).
 
 
+## v2026.03.15.5
+
+- Publish to npm as `@itunified/mcp-tailscale`, add `.npmignore`, `bin` entry, expanded keywords (#12)
+- Update package.json version to `2026.3.15`, description aligned with product positioning
+
 ## v2026.03.15.4
 
 - Add product positioning docs: restructured README, ROADMAP.md, ARCHITECTURE.md, PRODUCT_PACKAGING.md (#29)
