@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 This project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD.TS`).
 
 
+## v2026.03.16.3
+
+- **Plugin API: extract `createServer()` factory for enterprise extensibility** (#37)
+  - Add `src/types.ts` with `ToolHandler`, `ToolMiddleware`, and `ToolResult` types
+  - Add `src/server.ts` with `createServer()` factory supporting optional middleware
+  - Refactor `src/index.ts` to use `createServer()` internally (zero behavior change)
+  - Add `exports` map to `package.json` for subpath imports (`/server`, `/types`, `/client/*`, `/utils/*`, `/transport`)
+  - Add design doc `docs/plans/003-plugin-api.md`
+  - 199 unit tests (was 188)
+
 ## v2026.03.16.2
 
 - Add ADR-0024 reference to `.gitignore` and MCP Registry Tokens entry to CLAUDE.md security section (#35)
