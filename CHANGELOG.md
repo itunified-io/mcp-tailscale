@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 This project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD.TS`).
 
 
+## v2026.03.16.1
+
+- Register on official MCP Registry as `io.github.itunified-io/tailscale` (#12)
+- Add `server.json` metadata for MCP registry publishing
+- Add `mcpName` field to package.json for registry validation
+- Bump version to `2026.3.16`, publish `tailscale-mcp@2026.3.16` to npm
+- Add `.mcpregistry_*` to `.gitignore`
+
 ## v2026.03.15.5
 
 - Publish to npm as `tailscale-mcp`, add `.npmignore`, `bin` entry, expanded keywords (#12)
