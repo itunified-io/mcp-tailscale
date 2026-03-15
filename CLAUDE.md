@@ -87,6 +87,7 @@ docs/
 - **Credentials**: Never hardcoded, never logged, never in git
 - **Secret Redaction — MANDATORY**: When using `grep`, `cat`, `sed`, `awk`, shell scripts, or any tool that reads/displays file contents containing secrets (`.env`, credentials, API keys, tokens, passwords), **ALWAYS redact the secret values** in output. Never display raw secret values in terminal output, logs, conversation context, or commit messages.
 - **MCP Registry Tokens**: `.mcpregistry_*` files are gitignored (ADR-0024) AND npmignored. Never commit or publish registry auth tokens.
+- **Pre-Publish Security Scan — MANDATORY** (ADR-0026): `prepublishOnly` hook runs `scripts/prepublish-check.js` before every `npm publish`. Blocks publish if forbidden files (`.mcpregistry_*`, `.env`, `.pem`, `.key`, `credentials`) are in the tarball. Never bypass with `--ignore-scripts`.
 - **Public Repo Documentation Policy — MANDATORY**: This is a **public repository**. All documentation, code examples, test data, and commit messages MUST use only generic placeholders:
   - Tailnet names: `your-tailnet-name`, `example.com`
   - Device IDs: `123456789`
