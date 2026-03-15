@@ -6,7 +6,8 @@ This project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD.TS`).
 
 ## v2026.03.15.5
 
-- Publish to npm as `@itunified/mcp-tailscale`, add `.npmignore`, `bin` entry, expanded keywords (#12)
+- Publish to npm as `tailscale-mcp`, add `.npmignore`, `bin` entry, expanded keywords (#12)
+- Rename package from `@itunified/mcp-tailscale` to `tailscale-mcp` (npm free org cannot publish public scoped packages)
 - Update package.json version to `2026.3.15`, description aligned with product positioning
 
 ## v2026.03.15.4

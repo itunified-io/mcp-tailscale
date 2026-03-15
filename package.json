@@ -1,5 +1,5 @@
 {
-  "name": "@itunified/mcp-tailscale",
+  "name": "tailscale-mcp",
   "version": "2026.3.15",
   "description": "Secure MCP access for private infrastructure over Tailscale — 48 tools for devices, DNS, ACL, keys, users, webhooks, posture, and tailnet management via Tailscale API v2",
   "type": "module",
