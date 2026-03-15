@@ -123,6 +123,14 @@ docs/
 4. Push tag: `git push origin --tags`
 5. Create GitHub release: `gh release create v2026.03.13.1 --title "v2026.03.13.1 — <title>" --notes "<release notes>"`
 6. Release notes must list what changed and reference closed issues
+7. **Publish to npm**: `npm run build && npm publish --access public` (package: `tailscale-mcp`)
+
+### npm Publishing — MANDATORY
+- npm package name: `tailscale-mcp` (unscoped, published to npmjs.com)
+- **Every release MUST be published to npm** after tagging
+- Ensure `npm run build` succeeds before publishing
+- Verify with `npm view tailscale-mcp version` after publishing
+- Auth: granular access token set via `npm config set //registry.npmjs.org/:_authToken TOKEN`
 
 ## Git Workflow
 

@@ -2,6 +2,7 @@
 
 **Secure MCP access for private infrastructure over Tailscale**
 
+[![npm](https://img.shields.io/npm/v/tailscale-mcp?style=flat-square)](https://www.npmjs.com/package/tailscale-mcp)
 [![GitHub release](https://img.shields.io/github/v/release/itunified-io/mcp-tailscale?style=flat-square)](https://github.com/itunified-io/mcp-tailscale/releases)
 [![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue?style=flat-square)](LICENSE)
 [![CalVer](https://img.shields.io/badge/calver-YYYY.0M.DD.MICRO-22bfae?style=flat-square)](https://calver.org)
@@ -31,7 +32,17 @@ mcp-tailscale is an MCP Gateway Runtime that connects AI agents (Claude, GPT, cu
 
 ## Quick Start
 
+### Install from npm
+
 ```bash
+npm install -g tailscale-mcp
+```
+
+### Or clone and build from source
+
+```bash
+git clone https://github.com/itunified-io/mcp-tailscale.git
+cd mcp-tailscale
 npm install
 cp .env.example .env   # Edit with your Tailscale API key and tailnet name
 npm run build
