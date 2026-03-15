@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 This project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD.TS`).
 
 
+## v2026.03.15.2
+
+- Add Glama registry badge to README (#11)
+
 ## v2026.03.15.1
 
 - fix: use `/acl/validate` endpoint for `acl_test` tool — nonexistent `/acl/test` returned 404 (#17)
