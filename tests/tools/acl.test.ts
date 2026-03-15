@@ -178,23 +178,21 @@ describe("handleAclTool", () => {
   });
 
   describe("tailscale_acl_test", () => {
-    it("runs ACL tests", async () => {
-      const mockTestResult = {
-        results: [{ user: "user@example.com", errors: [], passed: true }],
-      };
+    it("runs ACL tests via validate endpoint", async () => {
+      const mockValidationResult = { message: "" };
       const policyWithTests = {
         ...SAMPLE_POLICY,
         tests: [{ src: "user@example.com", accept: ["100.64.0.2:80"] }],
       };
-      const client = mockClient({ post: vi.fn().mockResolvedValue(mockTestResult) });
+      const client = mockClient({ post: vi.fn().mockResolvedValue(mockValidationResult) });
 
       const result = await handleAclTool("tailscale_acl_test", {
         policy: policyWithTests,
       }, client);
 
-      expect(result.content[0].text).toContain("passed");
+      expect(result.content[0].text).toContain("message");
       expect(client.post).toHaveBeenCalledWith(
-        `/tailnet/${TAILNET}/acl/test`,
+        `/tailnet/${TAILNET}/acl/validate`,
         policyWithTests,
       );
     });
