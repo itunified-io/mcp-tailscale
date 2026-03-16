@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { ITailscaleClient } from "../client/types.js";
-import type { DeviceListResponse, DerpMap, LogStreamConfig } from "../client/types.js";
+import type { DeviceListResponse, DerpMap, LogStreamConfig, AclPolicy } from "../client/types.js";
+import { TailscaleApiError } from "../utils/errors.js";
 
 // ---------------------------------------------------------------------------
 // Zod schemas for input validation
@@ -28,6 +29,35 @@ const LogStreamSetSchema = z.object({
 });
 
 const DerpMapSchema = z.object({});
+
+const DerpMapSetSchema = z.object({
+  regions: z.record(
+    z.string(),
+    z.object({
+      regionId: z.number().int().positive(),
+      regionCode: z.string().min(1),
+      regionName: z.string().min(1),
+      avoid: z.boolean().optional(),
+      nodes: z.array(
+        z.object({
+          name: z.string().min(1),
+          regionId: z.number().int().positive(),
+          hostName: z.string().min(1),
+          certName: z.string().optional(),
+          ipv4: z.string().optional(),
+          ipv6: z.string().optional(),
+          stunPort: z.number().int().optional(),
+          stunOnly: z.boolean().optional(),
+          derpPort: z.number().int().optional(),
+        }),
+      ),
+    }),
+  ),
+  omitDefaultRegions: z.boolean().optional(),
+  confirm: z.literal(true, {
+    errorMap: () => ({ message: "confirm must be true to update the DERP map" }),
+  }),
+});
 
 // ---------------------------------------------------------------------------
 // Tool definitions (for ListTools)
@@ -99,10 +129,62 @@ export const diagnosticsToolDefinitions = [
   {
     name: "tailscale_derp_map",
     description:
-      "Get the DERP relay map for the tailnet. Shows all DERP regions and their relay nodes used for traffic routing.",
+      "Get the custom DERP relay map from the tailnet's ACL policy. Returns the derpMap field from the ACL, or a 'not configured' message if no custom DERP map exists.",
     inputSchema: {
       type: "object" as const,
       properties: {},
+    },
+  },
+  {
+    name: "tailscale_derp_map_set",
+    description:
+      "Set or update the custom DERP relay map in the tailnet's ACL policy. Requires confirm: true. Custom DERP regions use IDs 900-999. Set omitDefaultRegions: true to replace Tailscale's default relays entirely.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        regions: {
+          type: "object",
+          description: "Map of region ID (string) to region config. Custom regions should use IDs 900-999.",
+          additionalProperties: {
+            type: "object",
+            properties: {
+              regionId: { type: "number", description: "Region ID (900-999 for custom)" },
+              regionCode: { type: "string", description: "Short region code (e.g., 'mydc')" },
+              regionName: { type: "string", description: "Human-readable region name" },
+              avoid: { type: "boolean", description: "If true, avoid using this region" },
+              nodes: {
+                type: "array",
+                description: "DERP nodes in this region",
+                items: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string", description: "Node name" },
+                    regionId: { type: "number", description: "Must match parent region" },
+                    hostName: { type: "string", description: "DERP server hostname" },
+                    certName: { type: "string", description: "TLS cert name if different from hostName" },
+                    ipv4: { type: "string", description: "IPv4 address" },
+                    ipv6: { type: "string", description: "IPv6 address" },
+                    stunPort: { type: "number", description: "STUN port (default 3478)" },
+                    stunOnly: { type: "boolean", description: "If true, only use for STUN" },
+                    derpPort: { type: "number", description: "DERP port (default 443)" },
+                  },
+                  required: ["name", "regionId", "hostName"],
+                },
+              },
+            },
+            required: ["regionId", "regionCode", "regionName", "nodes"],
+          },
+        },
+        omitDefaultRegions: {
+          type: "boolean",
+          description: "If true, omit Tailscale's default DERP regions and use only custom ones",
+        },
+        confirm: {
+          type: "boolean",
+          description: "Must be true to confirm the DERP map update",
+        },
+      },
+      required: ["regions", "confirm"],
     },
   },
 ];
@@ -180,10 +262,22 @@ export async function handleDiagnosticsTool(
 
       case "tailscale_log_stream_get": {
         const parsed = LogStreamGetSchema.parse(args);
-        const result = await client.get<LogStreamConfig>(
-          `/tailnet/${client.tailnet}/logging/${parsed.logType}/stream`,
-        );
-        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+        try {
+          const result = await client.get<LogStreamConfig>(
+            `/tailnet/${client.tailnet}/logging/${parsed.logType}/stream`,
+          );
+          return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+        } catch (err: unknown) {
+          if (err instanceof TailscaleApiError && err.status === 404 ||
+              err instanceof Error && err.message.includes("404")) {
+            return { content: [{ type: "text", text: JSON.stringify({
+              configured: false,
+              logType: parsed.logType,
+              message: `No log streaming configured for '${parsed.logType}' logs. Configure via the Tailscale admin console (https://login.tailscale.com/admin/logs) or use tailscale_log_stream_set to set a streaming destination.`,
+            }, null, 2) }] };
+          }
+          throw err;
+        }
       }
 
       case "tailscale_log_stream_set": {
@@ -200,10 +294,44 @@ export async function handleDiagnosticsTool(
 
       case "tailscale_derp_map": {
         DerpMapSchema.parse(args);
-        const result = await client.get<DerpMap>(
-          `/tailnet/${client.tailnet}/derp-map`,
+        // DERP map is managed through the ACL policy's derpMap field
+        const acl = await client.get<AclPolicy & { derpMap?: DerpMap }>(
+          `/tailnet/${client.tailnet}/acl`,
         );
-        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+        if (acl.derpMap) {
+          return { content: [{ type: "text", text: JSON.stringify({
+            source: "acl-policy",
+            derpMap: acl.derpMap,
+          }, null, 2) }] };
+        }
+        return { content: [{ type: "text", text: JSON.stringify({
+          configured: false,
+          message: "No custom DERP map configured in ACL policy. The tailnet uses Tailscale's default DERP relay regions. To add custom DERP servers, use tailscale_derp_map_set with regions using IDs 900-999.",
+        }, null, 2) }] };
+      }
+
+      case "tailscale_derp_map_set": {
+        const parsed = DerpMapSetSchema.parse(args);
+        // Read current ACL, patch derpMap, write back
+        const currentAcl = await client.get<Record<string, unknown>>(
+          `/tailnet/${client.tailnet}/acl`,
+        );
+        const derpMap: Record<string, unknown> = {
+          Regions: parsed.regions,
+        };
+        if (parsed.omitDefaultRegions !== undefined) {
+          derpMap["OmitDefaultRegions"] = parsed.omitDefaultRegions;
+        }
+        const updatedAcl = { ...currentAcl, derpMap };
+        const result = await client.post<AclPolicy>(
+          `/tailnet/${client.tailnet}/acl`,
+          updatedAcl,
+        );
+        return { content: [{ type: "text", text: JSON.stringify({
+          message: "DERP map updated in ACL policy",
+          derpMap,
+          aclUpdated: true,
+        }, null, 2) }] };
       }
 
       default:

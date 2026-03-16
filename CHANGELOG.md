@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 This project uses [Calendar Versioning](https://calver.org/) (`YYYY.MM.DD.TS`).
 
 
+## v2026.03.17.1
+
+- **Fix DERP map, log streaming, and tailnet lock 404 handling** (#42)
+  - Fix `tailscale_derp_map` to read from ACL policy's `derpMap` field instead of non-existent standalone endpoint
+  - Add `tailscale_derp_map_set` tool — sets custom DERP regions (IDs 900-999) by patching the ACL policy
+  - Handle 404 gracefully for `tailscale_log_stream_get` — returns "not configured" instead of error
+  - Handle 404 gracefully for `tailscale_tailnet_lock_status` — returns "not initialized" with CLI setup instructions
+  - Tool count: 48 → 49
+  - Tests: 199 → 205
+
 ## v2026.03.16.4
 
 - **Add pre-publish security scan** (#39)

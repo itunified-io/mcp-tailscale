@@ -26,14 +26,14 @@ describe("createServer", () => {
     expect(result.toolHandlers).toBeDefined();
   });
 
-  it("registers all 48 tool definitions", () => {
+  it("registers all 49 tool definitions", () => {
     const { allToolDefinitions } = createServer();
-    expect(allToolDefinitions.length).toBe(48);
+    expect(allToolDefinitions.length).toBe(49);
   });
 
-  it("registers handlers for all 48 tools", () => {
+  it("registers handlers for all 49 tools", () => {
     const { toolHandlers } = createServer();
-    expect(toolHandlers.size).toBe(48);
+    expect(toolHandlers.size).toBe(49);
   });
 
   it("all tool definitions have name and description", () => {

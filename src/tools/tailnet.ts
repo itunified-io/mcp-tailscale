@@ -5,6 +5,7 @@ import type {
   TailnetContacts,
   TailnetLockStatus,
 } from "../client/types.js";
+import { TailscaleApiError } from "../utils/errors.js";
 
 // ---------------------------------------------------------------------------
 // Zod schemas for input validation
@@ -213,10 +214,22 @@ export async function handleTailnetTool(
 
       case "tailscale_tailnet_lock_status": {
         TailnetLockStatusSchema.parse(args);
-        const result = await client.get<TailnetLockStatus>(
-          `/tailnet/${client.tailnet}/lock/status`,
-        );
-        return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+        try {
+          const result = await client.get<TailnetLockStatus>(
+            `/tailnet/${client.tailnet}/lock/status`,
+          );
+          return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+        } catch (err: unknown) {
+          if (err instanceof TailscaleApiError && err.status === 404 ||
+              err instanceof Error && err.message.includes("404")) {
+            return { content: [{ type: "text", text: JSON.stringify({
+              enabled: false,
+              initialized: false,
+              message: "Tailnet Lock is not initialized. Tailnet Lock requires CLI setup — it cannot be enabled via API. Steps: (1) Run 'tailscale lock init' on a trusted device, (2) Sign existing nodes with 'tailscale lock sign', (3) Status will then be available via this tool. See https://tailscale.com/kb/1226/tailnet-lock for details.",
+            }, null, 2) }] };
+          }
+          throw err;
+        }
       }
 
       case "tailscale_tailnet_settings_update": {
