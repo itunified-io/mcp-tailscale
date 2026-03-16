@@ -56,7 +56,7 @@ export interface CreateServerResult {
   server: Server;
   /** The Tailscale API client */
   client: ITailscaleClient;
-  /** All 48 tool definitions */
+  /** All 49 tool definitions */
   allToolDefinitions: Tool[];
   /** Map of tool name → handler function */
   toolHandlers: Map<string, ToolHandler>;

@@ -23,8 +23,8 @@ function mockClient(overrides: Partial<ITailscaleClient> = {}): TailscaleClient 
 // ---------------------------------------------------------------------------
 
 describe("Diagnostics Tool Definitions", () => {
-  it("exports 5 tool definitions", () => {
-    expect(diagnosticsToolDefinitions).toHaveLength(5);
+  it("exports 6 tool definitions", () => {
+    expect(diagnosticsToolDefinitions).toHaveLength(6);
   });
 
   it("all tools have tailscale_ prefix", () => {
@@ -163,6 +163,20 @@ describe("handleDiagnosticsTool", () => {
 
       expect(result.content[0].text).toContain("Error executing tailscale_log_stream_get");
     });
+
+    it("returns not-configured message on 404", async () => {
+      const error = new Error("404 page not found");
+      const client = mockClient({ get: vi.fn().mockRejectedValue(error) });
+
+      const result = await handleDiagnosticsTool("tailscale_log_stream_get", {
+        logType: "configuration",
+      }, client);
+
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.configured).toBe(false);
+      expect(parsed.logType).toBe("configuration");
+      expect(parsed.message).toContain("No log streaming configured");
+    });
   });
 
   describe("tailscale_log_stream_set", () => {
@@ -212,31 +226,117 @@ describe("handleDiagnosticsTool", () => {
   });
 
   describe("tailscale_derp_map", () => {
-    it("gets the DERP map", async () => {
-      const mockDerpMap = {
-        regions: {
-          "1": {
-            regionId: 1,
-            regionCode: "nyc",
-            regionName: "New York City",
-            nodes: [{ name: "1a", regionId: 1, hostName: "derp1.tailscale.com", ipv4: "1.2.3.4", ipv6: "::1" }],
+    it("returns custom DERP map from ACL policy", async () => {
+      const mockAcl = {
+        acls: [],
+        derpMap: {
+          Regions: {
+            "900": {
+              regionId: 900,
+              regionCode: "mydc",
+              regionName: "My Data Center",
+              nodes: [{ name: "900a", regionId: 900, hostName: "derp.example.com", ipv4: "1.2.3.4", ipv6: "::1" }],
+            },
           },
         },
       };
-      const client = mockClient({ get: vi.fn().mockResolvedValue(mockDerpMap) });
+      const client = mockClient({ get: vi.fn().mockResolvedValue(mockAcl) });
 
       const result = await handleDiagnosticsTool("tailscale_derp_map", {}, client);
 
-      expect(result.content[0].text).toContain("nyc");
-      expect(client.get).toHaveBeenCalledWith(`/tailnet/${TAILNET}/derp-map`);
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.source).toBe("acl-policy");
+      expect(parsed.derpMap).toBeDefined();
+      expect(client.get).toHaveBeenCalledWith(`/tailnet/${TAILNET}/acl`);
+    });
+
+    it("returns not-configured message when no custom DERP map in ACL", async () => {
+      const mockAcl = { acls: [], groups: {} };
+      const client = mockClient({ get: vi.fn().mockResolvedValue(mockAcl) });
+
+      const result = await handleDiagnosticsTool("tailscale_derp_map", {}, client);
+
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.configured).toBe(false);
+      expect(parsed.message).toContain("No custom DERP map");
     });
 
     it("handles API errors gracefully", async () => {
-      const client = mockClient({ get: vi.fn().mockRejectedValue(new Error("Not found")) });
+      const client = mockClient({ get: vi.fn().mockRejectedValue(new Error("Unauthorized")) });
 
       const result = await handleDiagnosticsTool("tailscale_derp_map", {}, client);
 
       expect(result.content[0].text).toContain("Error executing tailscale_derp_map");
+    });
+  });
+
+  describe("tailscale_derp_map_set", () => {
+    it("updates DERP map in ACL policy when confirmed", async () => {
+      const currentAcl = { acls: [], groups: {} };
+      const updatedAcl = { acls: [], groups: {}, derpMap: {} };
+      const client = mockClient({
+        get: vi.fn().mockResolvedValue(currentAcl),
+        post: vi.fn().mockResolvedValue(updatedAcl),
+      });
+
+      const result = await handleDiagnosticsTool("tailscale_derp_map_set", {
+        regions: {
+          "900": {
+            regionId: 900,
+            regionCode: "mydc",
+            regionName: "My Data Center",
+            nodes: [{ name: "900a", regionId: 900, hostName: "derp.example.com" }],
+          },
+        },
+        confirm: true,
+      }, client);
+
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.aclUpdated).toBe(true);
+      expect(parsed.message).toContain("DERP map updated");
+      expect(client.get).toHaveBeenCalledWith(`/tailnet/${TAILNET}/acl`);
+      expect(client.post).toHaveBeenCalledWith(
+        `/tailnet/${TAILNET}/acl`,
+        expect.objectContaining({ derpMap: expect.any(Object) }),
+      );
+    });
+
+    it("rejects without confirm: true", async () => {
+      const client = mockClient();
+
+      const result = await handleDiagnosticsTool("tailscale_derp_map_set", {
+        regions: { "900": { regionId: 900, regionCode: "x", regionName: "X", nodes: [] } },
+        confirm: false,
+      }, client);
+
+      expect(result.content[0].text).toContain("Error executing tailscale_derp_map_set");
+    });
+
+    it("supports omitDefaultRegions", async () => {
+      const client = mockClient({
+        get: vi.fn().mockResolvedValue({ acls: [] }),
+        post: vi.fn().mockResolvedValue({}),
+      });
+
+      await handleDiagnosticsTool("tailscale_derp_map_set", {
+        regions: {
+          "900": {
+            regionId: 900,
+            regionCode: "mydc",
+            regionName: "My DC",
+            nodes: [{ name: "900a", regionId: 900, hostName: "derp.example.com" }],
+          },
+        },
+        omitDefaultRegions: true,
+        confirm: true,
+      }, client);
+
+      expect(client.post).toHaveBeenCalledWith(
+        `/tailnet/${TAILNET}/acl`,
+        expect.objectContaining({
+          derpMap: expect.objectContaining({ OmitDefaultRegions: true }),
+        }),
+      );
     });
   });
 

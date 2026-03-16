@@ -179,8 +179,20 @@ describe("handleTailnetTool", () => {
       expect(client.get).toHaveBeenCalledWith(`/tailnet/${TAILNET}/lock/status`);
     });
 
-    it("handles API errors gracefully", async () => {
-      const client = mockClient({ get: vi.fn().mockRejectedValue(new Error("Not found")) });
+    it("returns not-initialized message on 404", async () => {
+      const error = new Error("404 Not Found");
+      const client = mockClient({ get: vi.fn().mockRejectedValue(error) });
+
+      const result = await handleTailnetTool("tailscale_tailnet_lock_status", {}, client);
+
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.enabled).toBe(false);
+      expect(parsed.initialized).toBe(false);
+      expect(parsed.message).toContain("not initialized");
+    });
+
+    it("handles non-404 API errors gracefully", async () => {
+      const client = mockClient({ get: vi.fn().mockRejectedValue(new Error("Unauthorized")) });
 
       const result = await handleTailnetTool("tailscale_tailnet_lock_status", {}, client);
 

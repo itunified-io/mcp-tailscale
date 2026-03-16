@@ -96,7 +96,8 @@ Authentication: `Authorization: Bearer <api-key>` or OAuth client credentials
 | `tailscale_api_verify` | GET | `/tailnet/{tailnet}/devices` (connectivity check) |
 | `tailscale_log_stream_get` | GET | `/tailnet/{tailnet}/logging/{logType}/stream` |
 | `tailscale_log_stream_set` | PUT | `/tailnet/{tailnet}/logging/{logType}/stream` |
-| `tailscale_derp_map` | GET | `/tailnet/{tailnet}/derp-map` |
+| `tailscale_derp_map` | GET | `/tailnet/{tailnet}/acl` (extracts `derpMap` field) |
+| `tailscale_derp_map_set` | GET+POST | `/tailnet/{tailnet}/acl` (reads ACL, patches `derpMap`, writes back) |
 
 ## Notes
 
