@@ -44,7 +44,7 @@ export interface CreateServerOptions {
   middleware?: ToolMiddleware;
   /** Server name (default: "mcp-tailscale") */
   name?: string;
-  /** Server version (default: "2026.3.16") */
+  /** Server version (default: "2026.3.18") */
   version?: string;
 }
 
@@ -84,7 +84,7 @@ export function createServer(
   const {
     middleware,
     name = "mcp-tailscale",
-    version = "2026.3.16",
+    version = "2026.3.18",
   } = options ?? {};
 
   // Assemble all tool definitions

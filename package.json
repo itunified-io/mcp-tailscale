@@ -1,8 +1,8 @@
 {
   "name": "tailscale-mcp",
   "mcpName": "io.github.itunified-io/tailscale",
-  "version": "2026.3.17",
-  "description": "Secure MCP access for private infrastructure over Tailscale — 48 tools for devices, DNS, ACL, keys, users, webhooks, posture, and tailnet management via Tailscale API v2",
+  "version": "2026.3.18",
+  "description": "Secure MCP access for private infrastructure over Tailscale — 49 tools for devices, DNS, ACL, keys, users, webhooks, posture, and tailnet management via Tailscale API v2",
   "type": "module",
   "main": "dist/index.js",
   "exports": {
